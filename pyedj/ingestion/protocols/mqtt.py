@@ -5,41 +5,69 @@ from paho.mqtt.client import Client
 from pyedj.ingestion.protocols.abstract import Abstract
 
 
+class MqttError(Exception):
+    pass
+
+
 class Mqtt(Abstract):
 
     def __init__(self, service_info=None):
-        self.client = None
         self.service_info = service_info
+        self.connected = False
+        self.client = None
         self.queue = Queue()
 
-    def is_connected(self):
-        pass
+    def start(self, stream):
+        self.stream = stream
+        self.connect()
+        self.receive_msgs()
 
-    def connect(self, service_info=None):
-        if service_info:
-            self.service_info = service_info
+    def stop(self):
+        self.stream = None
+        self.stop_receiving_msgs()
+        self.disconnect()
 
-        host = self.service_info['host']
-        port = self.service_info['port']
+    def is_running(self):
+        if self.client and self.stream and self.connected:
+            return True
 
-        self.client = Client()
-        self.client.on_message = self.on_mqtt_msg
-        self.client.connect(host, port, 60)
+        return False
+
+    def connect(self):
+        if not self.client:
+            host = self.service_info['host']
+            port = self.service_info['port']
+
+            self.client = Client()
+            self.client.on_message = self.on_mqtt_msg
+            self.client.on_connect = self.on_connect
+            self.client.on_disconnect = self.on_disconnect
+            self.client.connect(host, port, 60)
+
+    def on_connect(self, client, userdata, flags, rc):
+        self.connected = True
 
     def disconnect(self):
         if self.client:
             self.client.disconnect()
 
+    def on_disconnect(self, client, userdata, rc):
+        self.client = None
+        self.connected = False
+
     def send_msg(self, msg, tx_info=None):
-        topic = None
+        if self.client:
+            topic = None
 
-        if tx_info:
-            topic = tx_info['topic']
-        elif self.service_info:
-            topic = self.service_info['publish']['default_topic']
+            if tx_info:
+                topic = tx_info['topic']
+            elif self.service_info:
+                topic = self.service_info['publish']['default_topic']
 
-        if self.client and topic:
-            self.client.publish(topic, msg)
+            if self.client and topic:
+                self.client.publish(topic, msg)
+        else:
+            raise MqttError('Cannot send message without a client')
 
     def receive_msgs(self):
         topics = self.service_info['subscribe']['topics']
@@ -48,9 +76,28 @@ class Mqtt(Abstract):
             for t in topics:
                 self.client.subscribe(t, 0)
 
-            self.client.loop_forever()
+            sub_type = self.service_info['subscribe']['type']
+
+            if sub_type == 'blocking':
+                self.client.loop_forever()
+            elif sub_type == 'unblocking':
+                self.client.loop_start()
+            elif sub_type == 'polled':
+                self.client.loop(self.service_info['subscribe']['loop_time'])
+            else:
+                self.client.loop(.1)
+
         else:
-            pass
+            raise MqttError('Cannot receive message without a client')
+
+    def stop_receiving_msgs(self):
+        topics = self.service_info['subscribe']['topics']
+
+        if self.client:
+            for t in topics:
+                self.client.unsubscribe(t)
+
+            self.client.loop_stop()
 
     def on_msg(self):
         msg = self.queue.get()
@@ -66,6 +113,5 @@ class Mqtt(Abstract):
 
         self.queue.put(payload)
         self.on_msg()
-
 
 Abstract.register(Mqtt)

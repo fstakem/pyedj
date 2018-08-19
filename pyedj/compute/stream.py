@@ -1,4 +1,4 @@
-import pyedj.data_store
+import pyedj.data_store.in_memory
 
 
 class StreamError(Exception):

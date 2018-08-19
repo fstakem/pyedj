@@ -49,8 +49,12 @@ def get_mqtt_info():
     service_info = {}
     service_info['host'] = '172.17.0.2'
     service_info['port'] = 1883
+    service_info['protocol'] = 'mqtt'
+    service_info['publish'] = {}
     service_info['publish']['default_topic'] = 'test'
+    service_info['subscribe'] = {}
     service_info['subscribe']['topics'] = ['test']
+    service_info['subscribe']['type'] = 'unblocking'
 
     return service_info
 
@@ -64,6 +68,7 @@ def get_stream_info():
 
 
 def test_simple_storage():
+    print()
     service_info = get_mqtt_info()
     stream_info = get_stream_info()
     stream = Stream(stream_info)

@@ -1,10 +1,11 @@
 from collections import namedtuple
 
-import pyedj.ingestion.protocols
+import pyedj.ingestion.protocols.mqtt
 
 
 class RouteError(Exception):
     pass
+
 
 Route = namedtuple('Route', 'name, on, subscriber, stream')
 
@@ -60,7 +61,8 @@ class Router(object):
         if name not in self.routes.keys():
             raise RouteError('Route name is not defined')
 
-        self.routes[name].subscriber.start()
+        route = self.routes[name]
+        route.subscriber.start(route.stream)
 
     def stop(self, name):
         if name not in self.routes.keys():
@@ -69,13 +71,13 @@ class Router(object):
         self.routes[name].subscriber.stop()
 
     def start_all(self):
-        for name, route in self.routes:
-            route.start()
+        for name, route in self.routes.items():
+            route.subscriber.start(route.stream)
 
     def stop_all(self):
-        for name, route in self.routes:
-            route.stop()
+        for name, route in self.routes.items():
+            route.subscriber.stop()
 
     def __iter__(self):
-        for k, v in self.routes:
+        for k, v in self.routes.items():
             yield k, v
