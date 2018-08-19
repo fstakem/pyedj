@@ -1,12 +1,32 @@
+import pyedj.data_store
+
+
+class StreamError(Exception):
+    pass
 
 
 class Stream(object):
+    supported_stores = ['in_memory']
 
-    def __init__(self, name, data_store, enricher):
-        self.name = name
-        self.data_store = data_store
-        self.ingress_enricher = enricher
+    def __init__(self, stream_info):
+        self.name = stream_info['name']
+        self.ingress_enricher = None
         self.syncrhonizers = {}
+        self.store = Stream.create_store(stream_info)
+
+    @classmethod
+    def create_store(cls, stream_info):
+        store = stream_info['store_type']
+
+        if store not in cls.supported_stores:
+            raise StreamError(f'Cannot create store with type({store})')
+
+        mod = getattr(pyedj.data_store, store)
+        klass_name = ''.join([s.capitalize() for s in store.split('_')])
+        klass = getattr(mod, klass_name)
+        store = klass(stream_info)
+
+        return store
 
     def add_synchronizer(self, synch):
         self.synchronizers[synch.name] = synch
@@ -23,23 +43,5 @@ class Stream(object):
     def num_synchronizers(self):
         return len(self.syncrhonizers)
 
-    def add_events(self, events):
-        enriched_events = self.ingress_enricher.enriched_events(events)
-        self.data_store.add_events(enriched_events)
-
-    def add_interleaved_events(self, events):
-        enriched_events = self.ingress_enricher.enriched_events(events)
-        self.data_store.add_interleaved_events(enriched_events)
-
-    def add_block(self, block):
-        enriched_block = self.ingress_enricher.enriched_block(block)
-        self.data_store.add_block(enriched_block)
-
-    def get_events(self, window_len_ms):
-        return self.data_store.get_events(window_len_ms)
-
-    def get_n_events(self, n):
-        return self.data_store.get_n_events(n)
-
-    def trim_store(self, trim_size_ms):
-        self.data_store.trim(trim_size_ms)
+    def handle_msg(self, msg):
+        pass

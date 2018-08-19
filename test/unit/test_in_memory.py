@@ -3,13 +3,13 @@ from collections import deque
 from datetime import datetime, timedelta
 from operator import attrgetter
 
-from pyedj.data_store.in_memory_store import InMemmoryStore
+from pyedj.data_store.in_memory import InMemmory
 
 from event_helper import generate_events
 
 
 def create_store(events=None):
-    store = InMemmoryStore()
+    store = InMemmory()
 
     if events:
         store.buffer = deque(events)

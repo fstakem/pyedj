@@ -6,7 +6,7 @@ from threading import Semaphore
 from pyedj.compute.event import Timestamp
 
 
-class InMemmoryStore(object):
+class InMemmory(object):
     # Data stored in objects: column store could be more efficient
     # Objects stored in deque according to timestamp
     #   left being most recent and right being oldest

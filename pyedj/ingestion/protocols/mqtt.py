@@ -2,18 +2,23 @@ from queue import Queue
 
 from paho.mqtt.client import Client
 
-from open_edge.ingestion.protocols.abstract import Abstract
+from pyedj.ingestion.protocols.abstract import Abstract
 
 
 class Mqtt(Abstract):
 
-    def __init__(self):
+    def __init__(self, service_info=None):
         self.client = None
-        self.service_info = None
+        self.service_info = service_info
         self.queue = Queue()
 
-    def connect(self, service_info):
-        self.service_info = service_info
+    def is_connected(self):
+        pass
+
+    def connect(self, service_info=None):
+        if service_info:
+            self.service_info = service_info
+
         host = self.service_info['host']
         port = self.service_info['port']
 
@@ -50,6 +55,9 @@ class Mqtt(Abstract):
     def on_msg(self):
         msg = self.queue.get()
         print(f'Received: {msg["topic"]}::{msg["msg"]}')
+
+        if self.stream:
+            self.stream.handle_msg(msg)
 
     def on_mqtt_msg(self, client, userdata, msg):
         payload = {}
