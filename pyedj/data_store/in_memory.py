@@ -43,6 +43,8 @@ class InMemory(object):
                 events = sorted(events, key=attrgetter("timestamp"), reverse=True)
                 self.add_interleaved_events(events)
 
+        print(self.buffer)
+
     def add_interleaved_events(self, events):
         new_buffer = []
         stored_index = 0

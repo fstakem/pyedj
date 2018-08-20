@@ -61,8 +61,29 @@ def get_mqtt_info():
 
 def get_stream_info():
     stream_info = {}
-    stream_info['name'] = 'test_stream'
-    stream_info['store_type'] = 'in_memory'
+    stream_info['name'] = 'PirSensor'
+    stream_info['debug'] = True
+    stream_info['store'] = {}
+    stream_info['store']['type'] = 'in_memory'
+    stream_info['deserializer'] = {}
+    stream_info['deserializer']['type'] = 'json'
+    stream_info['enricher'] = {}
+    stream_info['enricher']['type'] = 'simple'
+    stream_info['schema'] = {}
+    stream_info['schema']['fields'] = {}
+
+    stream_info['schema']['fields']['timestamp'] = {
+        'type': 'timestamp',
+        'default_value': '',
+        'type_check': True,
+        'parser': '%Y-%m-%d %H:%M:%S'
+    }
+
+    stream_info['schema']['fields']['value'] = {
+        'type': 'float',
+        'default_value': 0.0,
+        'type_check': True
+    }
 
     return stream_info
 
