@@ -77,6 +77,6 @@ class Stream(object):
         return len(self.syncrhonizers)
 
     def handle_msg(self, msg):
-        data = self.deserializer(msg)
+        data = self.deserializer(msg['msg'])
         events = self.enricher(data)
         self.store.add_events(events)

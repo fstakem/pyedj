@@ -74,7 +74,7 @@ def get_stream_info():
 
     stream_info['schema']['fields']['timestamp'] = {
         'type': 'timestamp',
-        'default_value': '',
+        'default_value': datetime.utcnow(),
         'type_check': True,
         'parser': '%Y-%m-%d %H:%M:%S'
     }
