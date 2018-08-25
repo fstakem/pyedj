@@ -7,7 +7,6 @@ import json
 import time
 
 from pyedj.ingestion.router import Router
-from pyedj.compute.stream import Stream
 
 from mqtt_client import MqttClient
 
@@ -19,11 +18,13 @@ def get_msgs(start_time, interval_sec, num):
     msgs = []
 
     for i in range(num):
-        num = random() * 100
+        pir_num = random() * 100
+        temp_num = random() * 100
         timestamp = start_time + timedelta(seconds=(i*interval_sec))
         msg = {
                 'timestamp': timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-                'value': num}
+                'pir': pir_num,
+                'temp': temp_num}
         msgs.append(msg)
 
     return msgs
@@ -47,6 +48,7 @@ def spawn_test_client(service_info, interval_sec, num_msgs):
 
 def get_mqtt_info():
     service_info = {}
+    service_info['name'] = 'mqtt'
     service_info['host'] = '172.17.0.2'
     service_info['port'] = 1883
     service_info['protocol'] = 'mqtt'
@@ -59,10 +61,11 @@ def get_mqtt_info():
     return service_info
 
 
-def get_stream_info():
+def get_stream_info(name, handle):
     stream_info = {}
-    stream_info['name'] = 'PirSensor'
+    stream_info['name'] = name
     stream_info['debug'] = True
+    stream_info['handle'] = handle
     stream_info['store'] = {}
     stream_info['store']['type'] = 'in_memory'
     stream_info['deserializer'] = {}
@@ -79,7 +82,7 @@ def get_stream_info():
         'parser': '%Y-%m-%d %H:%M:%S'
     }
 
-    stream_info['schema']['fields']['value'] = {
+    stream_info['schema']['fields'][handle] = {
         'type': 'float',
         'default_value': 0.0,
         'type_check': True
@@ -91,11 +94,16 @@ def get_stream_info():
 def test_simple_storage():
     print()
     service_info = get_mqtt_info()
-    stream_info = get_stream_info()
-    stream = Stream(stream_info)
+    pir_stream_info = get_stream_info('PirSensor', 'pir')
+    temp_stream_info = get_stream_info('TempSensor', 'temp')
+    stream_infos = [pir_stream_info, temp_stream_info]
 
     router = Router()
-    router.create_route('mqtt_sensor_a', service_info, stream)
+    route_names = router.create_routes(service_info, stream_infos)
+
+    for r in route_names:
+        print('Route created: {}'.format(r))
+
     router.start_all()
 
     spawn_test_client(service_info, 3, 3)

@@ -12,23 +12,33 @@ class MqttError(Exception):
 class Mqtt(Abstract):
 
     def __init__(self, service_info=None):
+        self.name = service_info['name']
         self.service_info = service_info
         self.connected = False
         self.client = None
         self.queue = Queue()
+        self.streams = {}
 
-    def start(self, stream):
-        self.stream = stream
+    def start(self):
         self.connect()
         self.receive_msgs()
 
     def stop(self):
-        self.stream = None
         self.stop_receiving_msgs()
         self.disconnect()
 
-    def is_running(self):
-        if self.client and self.stream and self.connected:
+    def add_stream(self, stream):
+        self.streams[stream.name] = stream
+
+    def remove_stream(self, name):
+        if name in self.streams.keys():
+            self.streams.pop(name)
+
+    def remove_all_streams(self):
+        self.streams = {}
+
+    def is_connected(self):
+        if self.client and self.connected:
             return True
 
         return False
@@ -103,8 +113,8 @@ class Mqtt(Abstract):
         msg = self.queue.get()
         print(f'Received: {msg["topic"]}::{msg["msg"]}')
 
-        if self.stream:
-            self.stream.handle_msg(msg)
+        for k, s in self.streams.items():
+            s.handle_msg(msg)
 
     def on_mqtt_msg(self, client, userdata, msg):
         payload = {}

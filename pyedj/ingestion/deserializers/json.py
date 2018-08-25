@@ -29,18 +29,7 @@ class Json(object):
 
         self.event_class = EventTypeFactory(self.name, self.schema, self.checked)
 
-        if type(self.event_class) == namedtuple:
-            self.__class__.__call__ = self.parse_namedtuple
-        else:
-            self.__class__.__call__ = self.parse_class
-
-    def parse_namedtuple(self, msg):
-        fields = self.parse_msg(msg)
-        event = self.event_class(*fields)
-
-        return [event]
-
-    def parse_class(self, msg):
+    def __call__(self, msg):
         fields = self.parse_msg(msg)
         event = self.event_class(*fields)
 

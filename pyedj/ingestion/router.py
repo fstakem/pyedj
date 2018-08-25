@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 import pyedj.ingestion.protocols.mqtt
+from pyedj.compute.stream import Stream
 
 
 class RouteError(Exception):
@@ -16,14 +17,28 @@ class Router(object):
     def __init__(self, routes=None):
         self.routes = {}
 
-    def create_route(self, name, service_info, stream):
-        if name in self.routes:
-            raise RouteError(f'Route name({name}) is already being used')
+    def create_routes(self, service_info, stream_infos):
+        names = [service_info['name'] + '_' + s['handle'] for s in stream_infos]
 
-        subscriber = Router.create_subscriber(service_info)
-        route = Route(name, False, subscriber, stream)
-        route.subscriber.connect()
-        self.routes[name] = route
+        for n in names:
+            if n in self.routes:
+                raise RouteError(f'Route name({n}) is already being used')
+
+        subscriber = self.get_subscriber(service_info['name'])
+
+        if not subscriber:
+            subscriber = Router.create_subscriber(service_info)
+
+        for n, s in zip(names, stream_infos):
+            stream = Stream(s)
+            subscriber.add_stream(stream)
+            route = Route(n, False, subscriber, stream)
+            self.routes[n] = route
+
+        if not subscriber.is_connected():
+            subscriber.connect()
+
+        return names
 
     @classmethod
     def create_subscriber(cls, service_info):
@@ -54,6 +69,13 @@ class Router(object):
 
         return self.routes[name]
 
+    def get_subscriber(self, name):
+        for n, v in self.routes.items():
+            if v.subscriber.name == name:
+                return v.subscriber
+
+        return None
+
     def num_routes(self):
         return len(self.routes)
 
@@ -62,7 +84,7 @@ class Router(object):
             raise RouteError('Route name is not defined')
 
         route = self.routes[name]
-        route.subscriber.start(route.stream)
+        route.subscriber.start()
 
     def stop(self, name):
         if name not in self.routes.keys():
@@ -72,7 +94,7 @@ class Router(object):
 
     def start_all(self):
         for name, route in self.routes.items():
-            route.subscriber.start(route.stream)
+            route.subscriber.start()
 
     def stop_all(self):
         for name, route in self.routes.items():
