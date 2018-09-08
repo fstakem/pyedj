@@ -13,7 +13,11 @@ class Json(object):
         self.types = {}
         self.parsers = {}
         self.fields = []
+        self.event_class = None
 
+        self.parse_service_info(service_info)
+
+    def parse_service_info(self, service_info):
         if not service_info['debug']:
             self.checked = False
 

@@ -5,7 +5,7 @@ from pyedj.compute.event import Event
 from pyedj.compute.stream import Stream
 
 
-def generate_events(num, offset_sec, start_time=None, random=True, in_order=True):
+def generate_events(start_time, offset_sec, events=None, num=0, in_order=True):
     if start_time:
         timestamp = start_time
     else:
@@ -17,14 +17,12 @@ def generate_events(num, offset_sec, start_time=None, random=True, in_order=True
     if not in_order:
         rand.shuffle(timestamps)
 
-    if random:
-        samples = [rand.randint(1, 101) for i in range(num)]
-    else:
-        samples = [i for i in range(num)]
+    if not events:
+        events = [rand.randint(1, 101) for i in range(num)]
 
-    events = [Event(t, s) for t, s in zip(timestamps, samples)]
+    gen_events = [Event(t, s) for t, s in zip(timestamps, events)]
 
-    return events
+    return gen_events
 
 
 def data_to_stream(name, data, offset_sec, start_time=None, in_order=True):

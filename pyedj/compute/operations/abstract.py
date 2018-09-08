@@ -7,5 +7,5 @@ class Abstract(ABC):
         self.parent = parent
 
     @abstractmethod
-    def compute(self, streams):
+    def __call__(self, streams):
         pass
