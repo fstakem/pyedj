@@ -12,12 +12,11 @@ class MqttError(Exception):
 class Mqtt(Abstract):
 
     def __init__(self, service_info=None):
-        self.name = service_info['name']
-        self.service_info = service_info
         self.connected = False
         self.client = None
         self.queue = Queue()
-        self.streams = {}
+
+        super().__init__(service_info)
 
     def start(self):
         self.connect()
@@ -109,12 +108,16 @@ class Mqtt(Abstract):
 
             self.client.loop_stop()
 
-    def on_msg(self):
+    def handle_msg(self):
         msg = self.queue.get()
         print(f'Received: {msg["topic"]}::{msg["msg"]}')
+        data = super().handle_msg(msg)
+
+        # TODO
+        # map variable to stream
 
         for k, s in self.streams.items():
-            s.handle_msg(msg)
+            s.handle_msg(data)
 
     def on_mqtt_msg(self, client, userdata, msg):
         payload = {}
@@ -122,6 +125,6 @@ class Mqtt(Abstract):
         payload['msg'] = msg.payload
 
         self.queue.put(payload)
-        self.on_msg()
+        self.handle_msg()
 
 Abstract.register(Mqtt)

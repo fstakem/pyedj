@@ -1,6 +1,6 @@
 from collections import namedtuple
+from importlib import import_module
 
-import pyedj.ingestion.protocols.mqtt
 from pyedj.compute.stream import Stream
 
 
@@ -47,7 +47,7 @@ class Router(object):
         if protocol not in cls.supported_protocols:
             raise RouteError(f'Cannot create route with protocol({protocol})')
 
-        mod = getattr(pyedj.ingestion.protocols, protocol)
+        mod = import_module('pyedj.ingestion.protocols.' + protocol)
         klass_name = ''.join([p.capitalize() for p in protocol.split('_')])
         klass = getattr(mod, klass_name)
         subscriber = klass(service_info)

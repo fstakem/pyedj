@@ -49,6 +49,7 @@ def spawn_test_client(service_info, interval_sec, num_msgs):
 def get_mqtt_info():
     service_info = {}
     service_info['name'] = 'mqtt'
+    service_info['debug'] = True
     service_info['host'] = '172.17.0.2'
     service_info['port'] = 1883
     service_info['protocol'] = 'mqtt'
@@ -57,6 +58,29 @@ def get_mqtt_info():
     service_info['subscribe'] = {}
     service_info['subscribe']['topics'] = ['test']
     service_info['subscribe']['type'] = 'unblocking'
+    service_info['deserializer'] = {}
+    service_info['deserializer']['type'] = 'json'
+    service_info['schema'] = {}
+    service_info['schema']['fields'] = {}
+
+    service_info['schema']['fields']['timestamp'] = {
+        'type': 'timestamp',
+        'default_value': datetime.utcnow(),
+        'type_check': True,
+        'parser': '%Y-%m-%d %H:%M:%S'
+    }
+
+    service_info['schema']['fields']['pir'] = {
+        'type': 'float',
+        'default_value': 0.0,
+        'type_check': True
+    }
+
+    service_info['schema']['fields']['temp'] = {
+        'type': 'float',
+        'default_value': 0.0,
+        'type_check': True
+    }
 
     return service_info
 
@@ -68,25 +92,8 @@ def get_stream_info(name, handle):
     stream_info['handle'] = handle
     stream_info['store'] = {}
     stream_info['store']['type'] = 'in_memory'
-    stream_info['deserializer'] = {}
-    stream_info['deserializer']['type'] = 'json'
     stream_info['enricher'] = {}
     stream_info['enricher']['type'] = 'simple'
-    stream_info['schema'] = {}
-    stream_info['schema']['fields'] = {}
-
-    stream_info['schema']['fields']['timestamp'] = {
-        'type': 'timestamp',
-        'default_value': datetime.utcnow(),
-        'type_check': True,
-        'parser': '%Y-%m-%d %H:%M:%S'
-    }
-
-    stream_info['schema']['fields'][handle] = {
-        'type': 'float',
-        'default_value': 0.0,
-        'type_check': True
-    }
 
     return stream_info
 

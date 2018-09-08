@@ -1,4 +1,3 @@
-from collections import namedtuple
 from datetime import datetime
 import json
 
@@ -7,18 +6,18 @@ from pyedj.compute.event_type_factory import EventTypeFactory
 
 class Json(object):
 
-    def __init__(self, stream_info):
-        self.name = stream_info['name']
-        self.schema = stream_info['schema']
+    def __init__(self, service_info):
+        self.name = service_info['name']
+        self.schema = service_info['schema']
         self.checked = True
         self.types = {}
         self.parsers = {}
         self.fields = []
 
-        if not stream_info['debug']:
+        if not service_info['debug']:
             self.checked = False
 
-        fields = stream_info['schema']['fields']
+        fields = service_info['schema']['fields']
 
         for k, v in fields.items():
             if v['type'] == 'timestamp':
