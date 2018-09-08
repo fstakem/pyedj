@@ -30,12 +30,12 @@ class Json(object):
 
     def __call__(self, msg):
         fields = self.parse_msg(msg)
-        event = self.event_class(*fields)
+        event = self.event_class(**fields)
 
         return [event]
 
     def parse_msg(self, msg):
-        out = []
+        out = {}
         data = json.loads(msg)
 
         for f in self.fields:
@@ -43,12 +43,11 @@ class Json(object):
             field = data[f]
 
             if field_type == 'timestamp':
-                o = datetime.strptime(field, self.parsers[f])
-                out.append(o)
+                out[f] = datetime.strptime(field, self.parsers[f])
             elif field_type == 'float':
-                out.append(float(field))
+                out[f] = float(field)
             elif field_type == 'int':
-                out.append(int(field))
+                out[f] = int(field)
             else:
                 raise Exception('Unknown field type')
 

@@ -48,7 +48,7 @@ def spawn_test_client(service_info, interval_sec, num_msgs):
 
 def get_mqtt_info():
     service_info = {}
-    service_info['name'] = 'mqtt'
+    service_info['name'] = 'MultiSensor'
     service_info['debug'] = True
     service_info['host'] = '172.17.0.2'
     service_info['port'] = 1883

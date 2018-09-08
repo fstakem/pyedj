@@ -3,6 +3,7 @@ from queue import Queue
 from paho.mqtt.client import Client
 
 from pyedj.ingestion.protocols.abstract import Abstract
+from pyedj.compute.event import Event
 
 
 class MqttError(Exception):
@@ -113,11 +114,15 @@ class Mqtt(Abstract):
         print(f'Received: {msg["topic"]}::{msg["msg"]}')
         data = super().handle_msg(msg)
 
-        # TODO
-        # map variable to stream
-
         for k, s in self.streams.items():
-            s.handle_msg(data)
+            events = []
+
+            for d in data:
+                timestamp = d.timestamp
+                sample = getattr(d, s.handle)
+                events.append(Event(timestamp, sample))
+
+            s.handle_msg(events)
 
     def on_mqtt_msg(self, client, userdata, msg):
         payload = {}

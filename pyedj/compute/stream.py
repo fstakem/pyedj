@@ -13,6 +13,7 @@ class Stream(object):
 
     def __init__(self, stream_info):
         self.name = stream_info['name']
+        self.handle = stream_info['handle']
         self.syncrhonizers = {}
         self.store = Stream.create_store(stream_info)
         self.enricher = Stream.create_enricher(stream_info)
@@ -62,6 +63,4 @@ class Stream(object):
 
     def handle_msg(self, msg):
         events = self.enricher(msg)
-        print('------------------------------------------')
-        print(events)
         self.store.add_events(events)
