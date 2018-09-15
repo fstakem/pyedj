@@ -12,7 +12,7 @@ def generate_events(start_time, events, in_order=True):
         timestamp = datetime.utcnow()
 
     end_time = len(events)
-    timestamps = [timestamp + timedelta(seconds=i) for i in range(end_time, 0, -1)]
+    timestamps = [timestamp + timedelta(seconds=i) for i in range(end_time-1, -1, -1)]
 
     if not in_order:
         rand.shuffle(timestamps)
