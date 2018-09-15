@@ -15,7 +15,7 @@ class SubFromAll(Abstract):
         for i in range(num_samples):
             timestamp = streams[0][i].timestamp
 
-            for j in enumerate(streams):
-                streams[j][i] = Event(timestamp, streams[j][i] - other[i])
+            for j, s in enumerate(streams):
+                s[i] = Event(timestamp, s[i].sample - other[i])
 
         return streams

@@ -10,10 +10,10 @@ class Sub(Abstract):
 
         for i in range(num_samples):
             timestamp = streams[0][i].timestamp
-            val = streams[0][i]
+            val = streams[0][i].sample
 
-            for j in enumerate(streams[1:]):
-                val = val - streams[j][i]
+            for j, s in enumerate(streams[1:]):
+                val = val - s[i].sample
 
             output.append(Event(timestamp, val))
 

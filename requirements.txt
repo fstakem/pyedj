@@ -2,3 +2,6 @@ ipython
 ipdb
 paho-mqtt
 pytest
+numpy
+scipy
+pandas
