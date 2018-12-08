@@ -14,7 +14,7 @@ def test_add_event_event():
     r_events = generate_events(start_time, r_values)
 
     add_op = Add(None)
-    events = add_op(l_events, r_events)
+    events = add_op.execute(l_events, r_events)
     expects = [6, 8, 10, 12]
 
     for i, e in enumerate(events):
@@ -28,7 +28,7 @@ def test_add_event_const():
     l_events = generate_events(start_time, l_values)
 
     add_op = Add(None)
-    events = add_op(l_events, 10)
+    events = add_op.execute(l_events, 10)
     expects = [11, 12, 13, 14]
 
     for i, e in enumerate(events):
@@ -42,7 +42,7 @@ def test_add_const_event():
     r_events = generate_events(start_time, r_values)
 
     add_op = Add(None)
-    events = add_op(10, r_events)
+    events = add_op.execute(10, r_events)
     expects = [11, 12, 13, 14]
 
     for i, e in enumerate(events):
@@ -54,7 +54,7 @@ def test_add_const_const():
     add_op = Add(None)
 
     with pytest.raises(SyntaxError):
-        add_op(10, 12)
+        add_op.execute(10, 12)
 
 
 def test_sub_event_event():
@@ -65,7 +65,7 @@ def test_sub_event_event():
     r_events = generate_events(start_time, r_values)
 
     sub_op = Subtract(None)
-    events = sub_op(l_events, r_events)
+    events = sub_op.execute(l_events, r_events)
     expects = [-4, -4, 6, 6]
 
     for i, e in enumerate(events):
@@ -79,7 +79,7 @@ def test_sub_event_const():
     l_events = generate_events(start_time, l_values)
 
     sub_op = Subtract(None)
-    events = sub_op(l_events, 10)
+    events = sub_op.execute(l_events, 10)
     expects = [-9, -8, 3, 4]
 
     for i, e in enumerate(events):
@@ -93,7 +93,7 @@ def test_sub_const_event():
     r_events = generate_events(start_time, r_values)
 
     sub_op = Subtract(None)
-    events = sub_op(10, r_events)
+    events = sub_op.execute(10, r_events)
     expects = [9, 8, -3, -4]
 
     for i, e in enumerate(events):
@@ -105,7 +105,7 @@ def test_sub_const_const():
     sub_op = Subtract(None)
 
     with pytest.raises(SyntaxError):
-        sub_op(10, 12)
+        sub_op.execute(10, 12)
 
 
 def test_multiply_event_event():
@@ -116,7 +116,7 @@ def test_multiply_event_event():
     r_events = generate_events(start_time, r_values)
 
     multiply_op = Multiply(None)
-    events = multiply_op(l_events, r_events)
+    events = multiply_op.execute(l_events, r_events)
     expects = [5, -12, 21, 32]
 
     for i, e in enumerate(events):
@@ -130,7 +130,7 @@ def test_multiply_event_const():
     l_events = generate_events(start_time, l_values)
 
     multiply_op = Multiply(None)
-    events = multiply_op(l_events, 10)
+    events = multiply_op.execute(l_events, 10)
     expects = [10, -20, 30, 40]
 
     for i, e in enumerate(events):
@@ -144,7 +144,7 @@ def test_multiply_const_event():
     r_events = generate_events(start_time, r_values)
 
     multiply_op = Multiply(None)
-    events = multiply_op(10, r_events)
+    events = multiply_op.execute(10, r_events)
     expects = [10, -20, 30, 40]
 
     for i, e in enumerate(events):
@@ -156,7 +156,7 @@ def test_multiply_const_const():
     multiply_op = Multiply(None)
 
     with pytest.raises(SyntaxError):
-        multiply_op(10, 12)
+        multiply_op.execute(10, 12)
 
 
 def test_divide_event_event():
@@ -167,7 +167,7 @@ def test_divide_event_event():
     r_events = generate_events(start_time, r_values)
 
     divide_op = Divide(None)
-    events = divide_op(l_events, r_events)
+    events = divide_op.execute(l_events, r_events)
     expects = [2, -10, 5, 5]
 
     for i, e in enumerate(events):
@@ -181,7 +181,7 @@ def test_divide_event_const():
     l_events = generate_events(start_time, l_values)
 
     divide_op = Divide(None)
-    events = divide_op(l_events, 10)
+    events = divide_op.execute(l_events, 10)
     expects = [1, -2, 3, 4]
 
     for i, e in enumerate(events):
@@ -195,7 +195,7 @@ def test_divide_const_event():
     r_events = generate_events(start_time, r_values)
 
     divide_op = Divide(None)
-    events = divide_op(10, r_events)
+    events = divide_op.execute(10, r_events)
     expects = [1, -0.5, 0.5, -1]
 
     for i, e in enumerate(events):
@@ -207,4 +207,4 @@ def test_divide_const_const():
     divide_op = Divide(None)
 
     with pytest.raises(SyntaxError):
-        divide_op(10, 12)
+        divide_op.execute(10, 12)

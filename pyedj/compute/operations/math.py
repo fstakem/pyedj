@@ -4,7 +4,7 @@ from pyedj.compute.event import Event
 
 class Add(Abstract):
 
-    def __call__(self, left, right):
+    def execute(self, left, right):
         if type(left) == list and type(right) == list:
             return [Event(l.timestamp, l.sample + r.sample) for l, r in zip(left, right)]
         elif type(left) == list:
@@ -20,7 +20,7 @@ class Add(Abstract):
 
 class Subtract(Abstract):
 
-    def __call__(self, left, right):
+    def execute(self, left, right):
         if type(left) == list and type(right) == list:
             return [Event(l.timestamp, l.sample - r.sample) for l, r in zip(left, right)]
         elif type(left) == list:
@@ -36,7 +36,7 @@ class Subtract(Abstract):
 
 class Multiply(Abstract):
 
-    def __call__(self, left, right):
+    def execute(self, left, right):
         if type(left) == list and type(right) == list:
             return [Event(l.timestamp, l.sample * r.sample) for l, r in zip(left, right)]
         elif type(left) == list:
@@ -52,7 +52,7 @@ class Multiply(Abstract):
 
 class Divide(Abstract):
 
-    def __call__(self, left, right):
+    def execute(self, left, right):
         if type(left) == list and type(right) == list:
             return [Event(l.timestamp, l.sample / r.sample) for l, r in zip(left, right)]
         elif type(left) == list:

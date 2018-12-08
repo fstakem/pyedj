@@ -16,7 +16,7 @@ def test_mean():
         print(e.timestamp)
 
     mean_op = Mean(None)
-    out_events = mean_op(events)
+    out_events = mean_op.execute(events)
     expects = [4.0]
 
     assert out_events[0].timestamp == start_time + timedelta(seconds=len(events)-1)
@@ -29,7 +29,7 @@ def test_median():
     events = generate_events(start_time, values)
 
     median_op = Median(None)
-    out_events = median_op(events)
+    out_events = median_op.execute(events)
     expects = [2.5]
 
     assert out_events[0].timestamp == start_time + timedelta(seconds=len(events)-1)
@@ -42,7 +42,7 @@ def test_range():
     events = generate_events(start_time, values)
 
     range_op = Range(None)
-    out_events = range_op(events)
+    out_events = range_op.execute(events)
     expects = [9]
 
     assert out_events[0].timestamp == start_time + timedelta(seconds=len(events)-1)
@@ -54,8 +54,8 @@ def test_percentile():
     values = [1, 2, 3, 10]
     events = generate_events(start_time, values)
 
-    pct_op = Percentile(None)
-    out_events = pct_op(events, 90)
+    pct_op = Percentile(None, 90)
+    out_events = pct_op.execute(events)
     expects = [7.9]
 
     assert out_events[0].timestamp == start_time + timedelta(seconds=len(events)-1)
@@ -68,7 +68,7 @@ def test_variance():
     events = generate_events(start_time, values)
 
     var_op = Variance(None)
-    out_events = var_op(events)
+    out_events = var_op.execute(events)
     expects = [12.5]
 
     assert out_events[0].timestamp == start_time + timedelta(seconds=len(events)-1)
@@ -81,7 +81,7 @@ def test_std():
     events = generate_events(start_time, values)
 
     std_op = Std(None)
-    out_events = std_op(events)
+    out_events = std_op.execute(events)
     expects = [3.535]
 
     assert out_events[0].timestamp == start_time + timedelta(seconds=len(events)-1)
@@ -94,7 +94,7 @@ def test_min():
     events = generate_events(start_time, values)
 
     min_op = Min(None)
-    out_events = min_op(events)
+    out_events = min_op.execute(events)
     expects = [1]
 
     assert out_events[0].timestamp == start_time + timedelta(seconds=len(events)-1)
@@ -107,7 +107,7 @@ def test_max():
     events = generate_events(start_time, values)
 
     max_op = Max(None)
-    out_events = max_op(events)
+    out_events = max_op.execute(events)
     expects = [10]
 
     assert out_events[0].timestamp == start_time + timedelta(seconds=len(events)-1)

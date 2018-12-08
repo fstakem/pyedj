@@ -6,7 +6,7 @@ from pyedj.compute.event import Event
 
 class Mean(Abstract):
 
-    def __call__(self, stream):
+    def execute(self, stream):
         values = [e.sample for e in stream]
 
         return [Event(stream[0].timestamp, mean(values))]
@@ -14,7 +14,7 @@ class Mean(Abstract):
 
 class Median(Abstract):
 
-    def __call__(self, stream):
+    def execute(self, stream):
         values = [e.sample for e in stream]
 
         return [Event(stream[0].timestamp, median(values))]
@@ -22,7 +22,7 @@ class Median(Abstract):
 
 class Range(Abstract):
 
-    def __call__(self, stream):
+    def execute(self, stream):
         values = [e.sample for e in stream]
 
         return [Event(stream[0].timestamp, ptp(values))]
@@ -30,15 +30,19 @@ class Range(Abstract):
 
 class Percentile(Abstract):
 
-    def __call__(self, stream, pct):
+    def __init__(self, parent, pct):
+        super().__init__(parent)
+        self.pct = pct
+
+    def execute(self, stream):
         values = [e.sample for e in stream]
 
-        return [Event(stream[0].timestamp, percentile(values, pct))]
+        return [Event(stream[0].timestamp, percentile(values, self.pct))]
 
 
 class Variance(Abstract):
 
-    def __call__(self, stream):
+    def execute(self, stream):
         values = [e.sample for e in stream]
 
         return [Event(stream[0].timestamp, var(values))]
@@ -46,7 +50,7 @@ class Variance(Abstract):
 
 class Std(Abstract):
 
-    def __call__(self, stream):
+    def execute(self, stream):
         values = [e.sample for e in stream]
 
         return [Event(stream[0].timestamp, std(values))]
@@ -54,7 +58,7 @@ class Std(Abstract):
 
 class Min(Abstract):
 
-    def __call__(self, stream):
+    def execute(self, stream):
         values = [e.sample for e in stream]
 
         return [Event(stream[0].timestamp, min(values))]
@@ -62,7 +66,7 @@ class Min(Abstract):
 
 class Max(Abstract):
 
-    def __call__(self, stream):
+    def execute(self, stream):
         values = [e.sample for e in stream]
 
         return [Event(stream[0].timestamp, max(values))]
