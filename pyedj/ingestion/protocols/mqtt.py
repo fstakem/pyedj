@@ -16,6 +16,7 @@ class Mqtt(Abstract):
         self.connected = False
         self.client = None
         self.queue = Queue()
+        self.protocol = service_info['protocol']
 
         super().__init__(service_info)
 
@@ -46,7 +47,7 @@ class Mqtt(Abstract):
     def connect(self):
         if not self.client:
             host = self.service_info['host']
-            port = self.service_info['port']
+            port = self.protocol['port']
 
             self.client = Client()
             self.client.on_message = self.on_mqtt_msg
@@ -72,7 +73,7 @@ class Mqtt(Abstract):
             if tx_info:
                 topic = tx_info['topic']
             elif self.service_info:
-                topic = self.service_info['publish']['default_topic']
+                topic = self.protocol['publish']['default_topic']
 
             if self.client and topic:
                 self.client.publish(topic, msg)
@@ -80,20 +81,20 @@ class Mqtt(Abstract):
             raise MqttError('Cannot send message without a client')
 
     def receive_msgs(self):
-        topics = self.service_info['subscribe']['topics']
+        topics = self.protocol['subscribe']['topics']
 
         if self.client:
             for t in topics:
                 self.client.subscribe(t, 0)
 
-            sub_type = self.service_info['subscribe']['type']
+            sub_type = self.protocol['subscribe']['type']
 
             if sub_type == 'blocking':
                 self.client.loop_forever()
             elif sub_type == 'unblocking':
                 self.client.loop_start()
             elif sub_type == 'polled':
-                self.client.loop(self.service_info['subscribe']['loop_time'])
+                self.client.loop(self.protocol['subscribe']['loop_time'])
             else:
                 self.client.loop(.1)
 
@@ -101,7 +102,7 @@ class Mqtt(Abstract):
             raise MqttError('Cannot receive message without a client')
 
     def stop_receiving_msgs(self):
-        topics = self.service_info['subscribe']['topics']
+        topics = self.protocol['subscribe']['topics']
 
         if self.client:
             for t in topics:

@@ -32,10 +32,10 @@ def get_msgs(start_time, interval_sec, num):
 
 def send_mqtt_msgs(service_info, msgs, interval_sec):
     client = MqttClient()
-    client.connect(service_info['host'], service_info['port'], 60)
+    client.connect(service_info['host'], service_info['protocol']['port'], 60)
 
     for msg in msgs:
-        client.publish(service_info['publish']['default_topic'], json.dumps(msg))
+        client.publish(service_info['protocol']['publish']['default_topic'], json.dumps(msg))
         time.sleep(interval_sec)
 
 
@@ -51,38 +51,52 @@ def get_mqtt_info():
     service_info['name'] = 'MultiSensor'
     service_info['debug'] = True
     service_info['host'] = '172.17.0.2'
-    service_info['port'] = 1883
-    service_info['protocol'] = 'mqtt'
-    service_info['publish'] = {}
-    service_info['publish']['default_topic'] = 'test'
-    service_info['subscribe'] = {}
-    service_info['subscribe']['topics'] = ['test']
-    service_info['subscribe']['type'] = 'unblocking'
+    service_info['protocol'] = get_net_protocol()
     service_info['deserializer'] = {}
     service_info['deserializer']['type'] = 'json'
-    service_info['schema'] = {}
-    service_info['schema']['fields'] = {}
+    service_info['schema'] = get_schema()
 
-    service_info['schema']['fields']['timestamp'] = {
+    return service_info
+
+
+def get_net_protocol():
+    protocol = {}
+
+    protocol['type'] = 'mqtt'
+    protocol['port'] = 1883
+    protocol['publish'] = {}
+    protocol['publish']['default_topic'] = 'test'
+    protocol['subscribe'] = {}
+    protocol['subscribe']['topics'] = ['test']
+    protocol['subscribe']['type'] = 'unblocking'
+
+    return protocol
+
+
+def get_schema():
+    schema = {}
+    schema['fields'] = {}
+
+    schema['fields']['timestamp'] = {
         'type': 'timestamp',
         'default_value': datetime.utcnow(),
         'type_check': True,
         'parser': '%Y-%m-%d %H:%M:%S'
     }
 
-    service_info['schema']['fields']['pir'] = {
+    schema['fields']['pir'] = {
         'type': 'float',
         'default_value': 0.0,
         'type_check': True
     }
 
-    service_info['schema']['fields']['temp'] = {
+    schema['fields']['temp'] = {
         'type': 'float',
         'default_value': 0.0,
         'type_check': True
     }
 
-    return service_info
+    return schema
 
 
 def get_stream_info(name, handle):
