@@ -25,7 +25,8 @@ class MqttClient(Client):
         print(out)
 
     def on_publish(self, client, userdata, mid):
-        print(f'Published for mid: {mid}')
+        pass
+        #print(f'Published for mid: {mid}')
 
     def on_subscribe(self, client, userdata, mid, granted_qos):
         print(f'Subscribed for mid: {mid}')
